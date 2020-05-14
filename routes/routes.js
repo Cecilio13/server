@@ -38,7 +38,7 @@ module.exports = app => {
     app.get("/product_tags", async (req, res) => {
         productTags.find(function (err, tags) {
             if (err) {
-               console.log(err); 
+                console.log(err);
             } else {
                 res.json(tags);
             }
@@ -55,14 +55,14 @@ module.exports = app => {
                 tag.product_tag_name = req.body.product_tag_name;
                 tag.product_tag_description = req.body.product_tag_description;
                 tag.product_tag_active = req.body.product_tag_active;
-    
+
                 tag.save()
-                .then(tag => {
-                    res.json('Tag updated')
-                })
-                .catch(err => {
-                    res.status(400).send("Update not possible")
-                });
+                    .then(tag => {
+                        res.json('Tag updated')
+                    })
+                    .catch(err => {
+                        res.status(400).send("Update not possible")
+                    });
             }
         });
     });
@@ -71,10 +71,10 @@ module.exports = app => {
     app.get("/product_tags/active", async (req, res) => {
         productTags.find({ product_tag_active: true }, function (err, tags) {
             if (err) {
-                console.log("err"); 
-             } else {
-                 res.json(tags);
-             }
+                console.log("err");
+            } else {
+                res.json(tags);
+            }
         });
     });
 
@@ -90,6 +90,38 @@ module.exports = app => {
                 res.status(400).send('adding new failed')
             });
     });
+
+
+
+    app.get('/purchase_orders', async (req, res) => {
+        PurchaseOrder.find(function (err, stock_control) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.json(stock_control);
+            }
+        });
+    });
+
+    app.get(function (req, res) {
+        let id = request.params.id;
+        PurchaseOrder.findById(id, function (err, stock_control) {
+            res.json(stock_control);
+        });
+    });
+
+    app.post('/purchase_orders/add', async (req, res) => {
+        let stock_control = new PurchaseOrder(req.body);
+        stock_control.save()
+            .then(stock_control => {
+                res.status(200).json({ 'Purchase Order': 'New Transaction Order Added' });
+            })
+            .catch(err => {
+
+                res.status(400).send(err)
+            });
+    });
+
 
     app.use('/product_tags', newProductTagRoutes);
     app.use('/products', newProductRoutes);
