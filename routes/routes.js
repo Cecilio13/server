@@ -7,6 +7,7 @@ const app = express();
 const newProductTagRoutes = express.Router();
 const newProductRoutes = express.Router();
 
+let PurchaseOrder = require('../model/schema/PurchaseOrder.js')
 //models
 const companies = mongoose.model('companies');
 const productTags = mongoose.model('product_tags');

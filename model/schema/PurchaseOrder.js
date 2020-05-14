@@ -3,14 +3,13 @@ const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
 const po_items = new Schema({
     product: [{ type: Schema.Types.ObjectId, ref: 'products' }],
-
     bill_to: String,
     ship_to: String,
     delivery_due_date: Date,
-    quantity: String,
-    item_cost: String,
-    tax: String,
-    total: String,
+    quantity: Number,
+    item_cost: Number,
+    tax: Number,
+    total: Number,
     created_at: Date,
     updated_at: Date,
 })
@@ -19,7 +18,7 @@ const POSchema = new Schema({
     po_no: String,
     invoice_no: String,
     supplier_note: String,
-    total: String,
+    total: Number,
     supplier: [{ type: Schema.Types.ObjectId, ref: 'suppliers' }],
     stock_source: String,
     entry_by: [{ type: Schema.Types.ObjectId, ref: 'users' }],
@@ -31,10 +30,7 @@ const POSchema = new Schema({
     },
     type: String,
     po_items: [po_items],
-    status: {
-        Type: String,
-        default: "Open"
-    },
+    status: String,
     created_at: Date,
     updated_at: Date,
 })
@@ -56,4 +52,4 @@ po_items.pre('save', function (next) {
 
     next();
 });
-mongoose.model('purchase_orders', POSchema);
+module.exports = mongoose.model('purchase_orders', POSchema);
