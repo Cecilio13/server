@@ -20,14 +20,14 @@ const variants_options = new Schema({
     brand: String,
     active: {
         type: Boolean,
-        default: false,
+        default: false, 
     },
     created_at: Date,
     updated_at: Date,
 })
 const variants = new Schema({
     option_title: String,
-    variants_options: { variants_options },
+    variants_options: [ variants_options ],
     created_at: Date,
     updated_at: Date,
 })
