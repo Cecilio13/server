@@ -16,6 +16,11 @@ app.use(cors())
 require('./routes/routes')(app);
 //connecting to MongoDB Database
 mongoose.connect(keys.mongoURI, { useNewUrlParser: true, useUnifiedTopology: false });
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('Congratulatiions! Your mongo db connection is successful');
+});
 // look for process.env.PORT for port or else use 5001 as port
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
