@@ -12,6 +12,11 @@ const ProductTagsSchema = new Schema({
     created_at: Date,
     updated_at: Date,
 })
+ProductTagsSchema.method("toJSON", function() {
+    const { __v, _id, ...object } = this.toObject();
+    object.id = _id;
+    return object;
+});
 ProductTagsSchema.pre('save', function (next) {
     now = new Date();
     this.updated_at = now;
