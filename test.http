@@ -1,25 +1,9 @@
-GET http://localhost:5001/newPurchaseOrder HTTP/1.1
 
 ###
-POST http://localhost:5001/newPurchaseOrder/add HTTP/1.1
-Content-Type: application/json
+GET http://localhost:5001/purchase_orders/return_order HTTP/1.1
 
-{
-    "poNo": 42,
-    "invoiceNo": 12,
-    "productName": "Nba Figurine",
-    "supplier": "NBA cares",
-    "billTo": "James Bryan",
-    "shipTo": "James Bryan",
-    "deliveryDue": "November-25-1997",
-    "quantity": 25,
-    "itemCost": 6000,
-    "tax": 12,
-    "total": 25000
-}
 ###
-GET http://localhost:5001/purchase_orders HTTP/1.1
-
+GET http://localhost:5001/products HTTP/1.1
 ###
 
 POST http://localhost:5001/purchase_orders/add HTTP/1.1
@@ -27,24 +11,68 @@ Content-Type: application/json
 
 // main schema
 {
-	"po_no" : "001",
-	"invoice_no" : "001",
-	"supplier_note" : "Supplier Note",
-	"total" : 252,
-	"stock_source" : "1000",
+	"po_no" : "PO1",
+	"invoice_no" : "PO1",
+	"supplier_note" : "Supplier Notes",
+	"total" : 155,
+	"stock_source" : "Sanfrancisco",
 	"due_date" : "November-25-1997",
-	"received" : false,
-	"type" : "1000",
+	"received" : true,
+	"type" : "Stock Order",
 	"status" : "Open",
 	"po_items" : [
 	    {
-	    	"bill_to" : "Address1",
-	    	"ship_to" : "Address1",
-	    	"quantity" : 25,
-	    	"delivery_due_date" : "November-25-1997",
-	    	"item_cost" : 2,
-	    	"tax" : 5,
-	    	"total" : 5
+	    	"bill_to" : "Address2",
+	    	"ship_to" : "Address2",
+	    	"quantity" : 2,
+	    	"delivery_due_date" : "November-21-1997",
+	    	"item_cost" : 1,
+	    	"tax" : 1,
+	    	"total" : 3
 	    }
 	]
+} 
+###
+
+POST http://localhost:5001/purchase_orders/update/5ebbff11b5d7ef1d88d9464c HTTP/1.1
+Content-Type: application/json
+
+// main schema
+{
+	"po_no" : "001",
+	"invoice_no" : "001",
+	"supplier_note" : "Supplier Notes Edited",
+	"total" : 255,
+	"stock_source" : "Sanfrancisco Edited",
+	"due_date" : "November-25-1997",
+	"received" : true,
+	"type" : "Stock Control",
+	"status" : "Closed",
+	"po_items" : [
+	    {
+	    	"bill_to" : "Address2 Edited 2 ",
+	    	"ship_to" : "Address2  Edited 2" ,
+	    	"quantity" : 11,
+	    	"delivery_due_date" : "November-21-1997",
+	    	"item_cost" : 151,
+	    	"tax" : 2,
+	    	"total" : 511
+	    }
+	]
+} 
+
+###
+
+DELETE http://localhost:5001/purchase_orders/delete/5ebe846e186c8113e09bd794 HTTP/1.1
+
+
+###
+
+POST http://localhost:5001/purchase_orders/updated/draft HTTP/1.1
+Content-Type: application/json
+
+// main schema
+{
+	"_id": "[5ebec10ce7e2e20a84a782d7]",
+	"status" : "Closed"
 } 

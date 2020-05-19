@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcryptjs');
@@ -24,10 +25,7 @@ const POSchema = new Schema({
     entry_by: [{ type: Schema.Types.ObjectId, ref: 'users' }],
     received_by: [{ type: Schema.Types.ObjectId, ref: 'users' }],
     due_date: Date,
-    received: {
-        Type: Boolean,
-        default: false
-    },
+    received : { type : Boolean, default: false },
     type: String,
     po_items: [po_items],
     status: String,
