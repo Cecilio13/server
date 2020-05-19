@@ -14,6 +14,7 @@ let PurchaseOrder = require('../model/schema/PurchaseOrder.js')
 const companies = mongoose.model('companies');
 const productTags = mongoose.model('product_tags');
 const products = mongoose.model('products');
+const purchaseOrder = mongoose.model('purchase_orders')
 const users = mongoose.model('users');
 
 //routes
@@ -90,10 +91,188 @@ module.exports = app => {
                 console.log(product);
             })
             .catch(err => {
-                res.status(400).send('adding new failed')
+                res.status(400).send(err)
+                //console.log(err);
             });
     });
+    app.get('/products', async (req, res) => {
+        products.find(function (err, stock_control) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.json(stock_control);
+            }
+        });
+    });
 
+    app.get(function (req, res) {
+        let id = request.params.id;
+        products.findById(id, function (err, stock_control) {
+            res.json(stock_control);
+        });
+    });
+    // Retrieve all Products
+    app.get("/products", async (req, res) => {
+        products.find(function (err, products) {
+            if (err) {
+               console.log(err); 
+            } else {
+                res.json(products);
+            }
+        });
+    });
+
+    // Retrieve all Product Variants
+    app.get("/products/variants", async (req, res) => {
+        let arr = [];
+        products.find({}, {'variants': 1}, function (err, prodVariants) {
+            if (err) {
+               console.log(err); 
+            } else {
+                prodVariants.map((x) => arr.push(x));
+                res.json(arr);
+            }
+        });
+    });
+
+    // Update a Product Status with id
+    app.post("/products/update_status/:id", async (req, res) => {
+        products.findById(req.params.id, function (err, product) {
+            if (!product) {
+                res.status(400).send('data not found');
+            }
+            else {
+                product.active = req.body.active;
+    
+                product.save()
+                .then(prod => {
+                    res.json('Product status updated')
+                })
+                .catch(err => {
+                    res.status(400).send("Update not possible")
+                });
+            }
+        });
+    });
+
+    // Update a Product Variant Status with id
+    app.post("/products/variants/update_status/:id", async (req, res) => {
+        products.findById(req.params.id, function (err, product) {
+            if (!product) {
+                res.status(400).send('data not found');
+            } else {
+                //var parent_id = req.body.parent_id;
+                var variant_id = req.body.id;
+                var variant_status = req.body.active;
+                product.variants.forEach((element, index, variants) => {
+                    if (element.id === variant_id) {
+                        variants[index].active = variant_status;
+                    }
+                });
+                product.save()
+                .then(prod => {
+                    res.json('Product variant status updated')
+                })
+                .catch(err => {
+                    res.status(400).send(err)
+                });
+            }
+        });
+    });
+
+    //Process Product array bulk action and update multiple active status
+    app.post("/products/bulk_action", async (req, res) => {
+        let arr = [];
+        arr = req.body;
+        console.log(arr);
+        for (let index = 0; index < arr.length; index++) {
+            let product_id = arr[index].id;
+            let product_active = arr[index].active;
+            products.findById(product_id, function (err, product) {
+                if (!product) {
+                    res.status(400).send('data not found');
+                } else {
+                    product.active = product_active;
+                    product.save()
+                    .then(prod => {
+                        //console.log(prod)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    });
+                }
+            });
+        }
+        res.json('Product status bulk action updated');
+    });
+
+    //Process Product variant array bulk action and update multiple active status
+    app.post("/products/variants/bulk_action", async (req, res) => {
+        let arr = [];
+        arr = req.body;
+        console.log(arr);
+        for (let index = 0; index < arr.length; index++) {
+            let product_id = arr[index].parent_id;
+            let variant_id = arr[index].variant_id;
+            let product_active = arr[index].variant_status;
+            products.findById(product_id, function (err, product) {
+                if (!product) {
+                    res.status(400).send('data not found');
+                } else {
+                    product.variants.forEach((element, index, variants) => {
+                        if (element.id === variant_id) {
+                            variants[index].active = !product_active;
+                            if (product_active === true) {
+                                variants[index].active = !product_active;
+                            }
+                        }
+                    });
+                    product.save()
+                    .then(prod => {
+                        //console.log(prod)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    });
+                }
+            });
+        }
+        res.json('Product status bulk action updated');
+    });
+
+    app.post("/products/variants/bulk_action1", async (req, res) => {
+        let arr = [];
+        arr = req.body;
+        console.log(arr);
+        for (let index = 0; index < arr.length; index++) {
+            let product_id = arr[index].parent_id;
+            let variant_id = arr[index].variant_id;
+            let product_active = arr[index].variant_status;
+            products.findById(product_id, function (err, product) {
+                if (!product) {
+                    res.status(400).send('data not found');
+                } else {
+                    product.variants.forEach((element, index, variants) => {
+                        if (element.id === variant_id) {
+                            variants[index].active = product_active;
+                            /*if (product_active === true) {
+                                variants[index].active = !product_active;
+                            }*/
+                        }
+                    });
+                    product.save()
+                    .then(prod => {
+                        //console.log(prod)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    });
+                }
+            });
+        }
+        res.json('Product status bulk action updated');
+    });
+    
 
 
     app.get('/purchase_orders', async (req, res) => {
@@ -101,9 +280,24 @@ module.exports = app => {
             if (err) {
                 console.log(err);
             } else {
+
                 res.json(stock_control);
             }
         });
+    });
+
+
+    app.get('/purchase_orders/purchase_order', async (req, res) => {
+        let x = await PurchaseOrder.find({ type: "Purchase Order" })
+        res.send(x);
+    });
+    app.get('/purchase_orders/stock_order', async (req, res) => {
+        let x = await PurchaseOrder.find({ type: "Stock Order" })
+        res.send(x);
+    });
+    app.get('/purchase_orders/return_order', async (req, res) => {
+        let x = await PurchaseOrder.find({ type: "Return Order" })
+        res.send(x);
     });
 
     app.get(function (req, res) {
@@ -124,6 +318,123 @@ module.exports = app => {
                 res.status(400).send(err)
             });
     });
+
+
+    app.delete("/purchase_orders/delete/:id", (req, res) => {
+        purchaseOrder.findByIdAndDelete(req.params.id)
+            .then(() => res.json({ remove: true }))
+    });
+
+
+    // Update a Product  with id
+    app.post("/purchase_orders/update/:id", async (req, res) => {
+        purchaseOrder.findById(req.params.id, function (err, order) {
+            if (!order) {
+                res.status(400).send('data not found');
+            }
+            else {
+                order.po_no = req.body.po_no;
+                order.invoice_no = req.body.invoice_no;
+                order.supplier_note = req.body.supplier_note;
+                order.total = req.body.total;
+                order.stock_source = req.body.stock_source;
+                order.due_date = req.body.due_date;
+                order.received = req.body.received;
+                order.type = req.body.type;
+                order.status = req.body.status;
+                order.po_items[0].ship_to = req.body.po_items[0].ship_to;
+                order.po_items[0].bill_to = req.body.po_items[0].bill_to;
+                order.po_items[0].quantity = req.body.po_items[0].quantity;
+                order.po_items[0].delivery_due_date = req.body.po_items[0].delivery_due_date;
+                order.po_items[0].item_cost = req.body.po_items[0].item_cost;
+                order.po_items[0].tax = req.body.po_items[0].tax;
+                order.po_items[0].total = req.body.po_items[0].total;
+
+                order.save()
+                    .then(tag => {
+                        res.json('Update Succesful')
+                    })
+                    .catch(err => {
+                        res.status(400).send("Update not possible")
+                    });
+            }
+        });
+    });
+
+
+    // Update a Product  with Status Draft
+    app.post("/purchase_orders/updated/draft", async (req, res) => {
+        const data = req.body.length;
+        for (let x = 0; x < data; x++) {
+
+            purchaseOrder.findById(req.body[x], function (err, order) {
+                if (!order) {
+                }
+                else {
+                    order.status = "Draft";
+                    order.save()
+                        .then(tag => {
+                        })
+                        .catch(err => {
+                        });
+                }
+            });
+
+        }
+
+
+    });
+
+    // Update a Product  with Status Open
+    app.post("/purchase_orders/open", async (req, res) => {
+        const request = req.body;
+        const data = req.body.length;
+        const stats = 0;
+        for (let x = 0; x < data; x++) {
+
+            purchaseOrder.findById(req.body[x], function (err, order) {
+                if (!order) {
+                }
+                else {
+                    order.status = "Open";
+                    order.save()
+                        .then(tag => {
+                        })
+                        .catch(err => {
+                        });
+                }
+            });
+
+        }
+
+
+    });
+
+    // Update a Product  with Status Void
+    app.post("/purchase_orders/void", async (req, res) => {
+        const request = req.body;
+        const data = req.body.length;
+        const stats = 0;
+        for (let x = 0; x < data; x++) {
+
+            purchaseOrder.findById(req.body[x], function (err, order) {
+                if (!order) {
+                }
+                else {
+                    order.status = "Void";
+                    order.save()
+                        .then(tag => {
+                        })
+                        .catch(err => {
+                        });
+                }
+            });
+
+        }
+
+
+    });
+
 
 
     app.use('/product_tags', newProductTagRoutes);
