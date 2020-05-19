@@ -1,0 +1,50 @@
+GET http://localhost:5001/newPurchaseOrder HTTP/1.1
+
+###
+POST http://localhost:5001/newPurchaseOrder/add HTTP/1.1
+Content-Type: application/json
+
+{
+    "poNo": 42,
+    "invoiceNo": 12,
+    "productName": "Nba Figurine",
+    "supplier": "NBA cares",
+    "billTo": "James Bryan",
+    "shipTo": "James Bryan",
+    "deliveryDue": "November-25-1997",
+    "quantity": 25,
+    "itemCost": 6000,
+    "tax": 12,
+    "total": 25000
+}
+###
+GET http://localhost:5001/purchase_orders HTTP/1.1
+
+###
+
+POST http://localhost:5001/purchase_orders/add HTTP/1.1
+Content-Type: application/json
+
+// main schema
+{
+	"po_no" : "001",
+	"invoice_no" : "001",
+	"supplier_note" : "Supplier Note",
+	"total" : 252,
+	"stock_source" : "1000",
+	"due_date" : "November-25-1997",
+	"received" : false,
+	"type" : "1000",
+	"status" : "Open",
+	"po_items" : [
+	    {
+	    	"bill_to" : "Address1",
+	    	"ship_to" : "Address1",
+	    	"quantity" : 25,
+	    	"delivery_due_date" : "November-25-1997",
+	    	"item_cost" : 2,
+	    	"tax" : 5,
+	    	"total" : 5
+	    }
+	]
+} 
