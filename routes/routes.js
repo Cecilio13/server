@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const tagController = require("../controllers/tag_controller");
 var express = require("express");
 const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
 const newProductTagRoutes = express.Router();
 const newProductRoutes = express.Router();
 
@@ -142,8 +144,10 @@ module.exports = app => {
     // add staff
     app.post('/staff/add', function(req, res){
         let user = new users(req.body);
-        user.save()
-            .then(user => {
+        console.log(req.body.birthday, 'this birthday');
+        console.log(typeof req.body.birthday, 'this is type of birthday');
+       user.save()
+         .then(user => {
                 res.status(200).json({'user': 'added'});
             })
             .catch(err => {
@@ -158,6 +162,8 @@ module.exports = app => {
     var month = monthNames[new Date().getMonth()];
     var year = new Date().getFullYear();
 
+    var dateToday = date+'-'+month+'-'+year;
+
     app.post('/staff/update/status', function(req, res){
         for(let i = 0; i < req.body.length; i++){
             users.findById(req.body[i]._id, function(err, user){
@@ -166,15 +172,25 @@ module.exports = app => {
                 }
                 else{
                     if(user.status === req.body[i].status){
-                        console.log(user.name + ' is already active');                        
+                        if(req.bod[i].status == true){
+                            console.log(user.name + ' is already active');   
+                        }                 
+                        else{
+                            console.log(user.name + ' is already disabled');   
+                        }                            
                     }
                     else{
                         user.status = req.body[i].status;
-                        user.action_log.push('Status changed into active at ' + date + '-'+month+'-'+year);
+                        if(req.body[i].status == true){
+                            user.action_log.push('Status changed into active at ' + dateToday);
+                        }
+                        else{
+                            user.action_log.push('Status changed into disabled at ' + dateToday);
+                        }                        
 
                         user.save()
                             .then(user => {
-                                res.json('add status successful')
+                                res.json('update status successful')
                             })
                             .catch(err => {
                                 res.status(400).send('add status unsuccessful ' + err)
@@ -197,7 +213,8 @@ module.exports = app => {
                 user.email = req.body.email,
                 user.address = req.body.address,
                 user.birthday = req.body.birthday,
-                user.username = req.body.username
+                user.username = req.body.username,
+                user.action_log.push('staff info edited at ' + dateToday);
 
                 user.save()
                     .then(user => {
@@ -223,6 +240,7 @@ module.exports = app => {
                 user.address = req.body.address,
                 user.birthday = req.body.birthday,
                 user.username = req.body.username
+                user.action_log.push('Profile account edited at ' + dateToday);
 
                 user.save()
                     .then(user => {
@@ -247,6 +265,7 @@ module.exports = app => {
                         info: req.body[i].info,
                         status: req.body[i].status
                     })
+                    user.action_log.push('Note: ' + req.body[i].info + ' was added at ' + dateToday);
                     user.save()
                         .then(user => {
                             res.json('add note successful')
@@ -261,19 +280,31 @@ module.exports = app => {
 
     //delete note
     app.post('/staff/delete/note', function(req, res){
-        users.findById(req.body._id, function(err, user){
+        users.findById(req.body.staff_id, function(err, user){
             if(!user){
                 res.status(400).send('id not found');
             }
             else{
-                user.remove(user.note)
-                    .then(user => {
-                        res.json('remove note successful')
-                    })
-                    .catch(err => {
-                        res.status(400).send('remove note unsuccessful' + err);
-                    })
+                for(let i = 0; i < user.note.length; i++){
+                    if(user.note[i]._id == req.body.note_id){
+                        user.note[i].status = false;
+                        user.action_log.push('Note: ' + user.note[i].info + ' was deleted at ' + dateToday);
+                        user.save()                        
+                            .then(user => {
+                                res.json('delete note successful')
+                            })
+                            .catch(err => {
+                                res.status(400).send('delete note unsuccessful' + err)
+                            });
+                        break;
+                    }
+                    else{
+                        continue;
+                    }
+                    
+                }
             }
         })
+        
     });
 }

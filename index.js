@@ -25,6 +25,8 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('Congratulatiions! Your mongo db connection is successful');
 });
+// look for process.env.PORT for port or else use 5001 as port
+const connection = mongoose.connection;
 
 const PORT =  5001;
 app.listen(PORT, () => {
