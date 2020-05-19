@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 const variants = new Schema({
   option_title: String, //?
-  supplier: [{ type: Schema.Types.ObjectId, ref: "suppliers" }],
+  //supplier: [{ type: Schema.Types.ObjectId, ref: "suppliers" }],
+  supplier: Object,
   supplier_price: String,
   price_with_tax: String,
   price_without_tax: String,
@@ -35,7 +36,8 @@ const product_tags = new Schema({
 const ProductSchema = new Schema({
   product_name: String,
   product_description: String,
-  product_type: [{ type: Schema.Types.ObjectId, ref: "product_types" }],
+  //product_type: [{ type: Schema.Types.ObjectId, ref: "product_types" }],
+  product_type: Object,
   product_tags: [ product_tags ],
   active: {
     type: Boolean,
